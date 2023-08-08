@@ -14,7 +14,7 @@ Add json file for level system:
 touch levels.json
 ```
 
-Edit level.json file:
+Edit levels.json file:
 ```json
 // levels.json
 {
