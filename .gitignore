@@ -106,6 +106,10 @@ ipython_config.py
 #pdm.lock
 #   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
 #   in version control.
+# extra files
+level.json
+test.py
+
 #   https://pdm.fming.dev/#use-with-ide
 .pdm.toml
 
