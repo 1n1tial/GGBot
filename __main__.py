@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+import discord.ext.commands as commands
 import os
 from dotenv import load_dotenv
 import random
@@ -27,6 +27,7 @@ def get_remaining_experience(experience):
 
 @bot.event
 async def on_ready():
+    await bot.tree.sync()
     print('Get, set, GG')
     
 @bot.event
@@ -71,6 +72,9 @@ async def level_up(users, user, message, exp):
         embed = discord.Embed(title="GG", description=f"{user.mention} has GGed up to level {lvl_end}! GG")
         embed.set_image(url=gif)
         await message.channel.send(embed=embed)
+        
+async def reset_data(users, user):
+    users[str(user.id)]["experience"] = 0
 
 
 @bot.event
@@ -84,7 +88,7 @@ async def on_member_join(member):
         json.dump(users, f)
 
 
-@bot.command(name='level')
+@bot.hybrid_command(name='level', description='Check your level!')
 async def level(ctx):
     with open('level.json', 'r') as f:
         users = json.load(f)
@@ -93,6 +97,19 @@ async def level(ctx):
     
     await ctx.send(f"{ctx.author.mention} is level {get_level(users[str(ctx.author.id)]['experience'])}\nOnly {get_remaining_experience(users[str(ctx.author.id)]['experience'])} GGs away from level {get_level(users[str(ctx.author.id)]['experience']) + 1}")
     
+
+    with open('level.json', 'w') as f:
+        json.dump(users, f)
+        
+
+@bot.hybrid_command(name='resetgg', description='Reset your level back to 0, be careful!')
+async def resetgg(ctx):
+    
+    with open('level.json', 'r') as f:
+        users = json.load(f)
+
+    await reset_data(users, ctx.author)
+    await ctx.send(f"{ctx.author.mention} has reset their level to 0, GG")
 
     with open('level.json', 'w') as f:
         json.dump(users, f)
