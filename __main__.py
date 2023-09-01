@@ -75,7 +75,16 @@ async def level_up(users, user, message, exp):
         
 async def reset_data(users, user):
     users[str(user.id)]["experience"] = 0
-
+    
+async def add_username(users):
+    for k, v in users.items():
+        try:
+            if not v["name"]:
+                x = await bot.fetch_user(k)
+                users[k]["name"] = x.name
+        except KeyError:
+            x = await bot.fetch_user(k)
+            users[k]["name"] = x.name
 
 @bot.event
 async def on_member_join(member):
@@ -86,6 +95,7 @@ async def on_member_join(member):
     
     with open('level.json', 'w') as f:
         json.dump(users, f)
+        
 
 
 @bot.hybrid_command(name='level', description='Check your level!')
@@ -113,6 +123,31 @@ async def resetgg(ctx):
 
     with open('level.json', 'w') as f:
         json.dump(users, f)
+
+
+@bot.hybrid_command(name='ggcnt', description='Check the GG counter!')
+async def leaderboard(ctx):
+    with open('level.json', 'r') as f:
+        users = json.load(f)
+    
+    await add_username(users)
+
+    users = dict(sorted(users.items(), key=lambda x: x[1]["experience"], reverse=True))
+    
+    a = ""
+    for v in users.values():
+        a += f"{v['name']}".ljust(30) + f"{v['experience']}\n"
+    
+    await ctx.send(f"```{a}```")
+    
+    
+    with open('level.json', 'w') as f:
+        json.dump(users, f)
+    
+    
+@bot.hybrid_command(name='ggboard', description='Check the GG leaderboard!')
+async def leaderboard(ctx):
+    pass
 
 
 bot.run(os.getenv('TOKEN'))
